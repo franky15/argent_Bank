@@ -1,0 +1,149 @@
+swagger: '2.0'
+info:
+  title: Bank Argent Transactions API Documentation
+  description: Contains all available API endpoints for transaction management
+  version: '2.0.0'
+  termsOfService: 'http://swagger.io/terms/'
+host: localhost:3001
+basePath: /user/profile
+schemes:
+  - http
+paths:
+  /transactions:
+    get:
+      tags:
+        - Transaction Module
+      summary: Get Transactions
+      description: Retrieve all transactions for the current month, grouped by account
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Transactions retrieved successfully
+          schema:
+            $ref: '#/definitions/TransactionList'
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
+  /transactions/{transactionId}:
+    get:
+      tags:
+        - Transaction Module
+      summary: Get Transaction Details
+      description: Retrieve details of a specific transaction
+      parameters:
+        - in: path
+          name: transactionId
+          type: string
+          required: true
+          description: ID of the transaction to retrieve details for
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Transaction details retrieved successfully
+          schema:
+            $ref: '#/definitions/Transaction'
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal Server Error
+    put:
+      tags:
+        - Transaction Module
+      summary: Update Transaction
+      description: Update details of a specific transaction
+      parameters:
+        - in: path
+          name: transactionId
+          type: string
+          required: true
+          description: ID of the transaction to update
+        - in: body
+          name: body
+          description: Updated transaction details
+          required: true
+          schema:
+            $ref: '#/definitions/TransactionUpdate'
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Transaction updated successfully
+          schema:
+            $ref: '#/definitions/Transaction'
+        '400':
+          description: Invalid Fields
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal Server Error
+    delete:
+      tags:
+        - Transaction Module
+      summary: Delete Transaction
+      description: Delete a specific transaction
+      parameters:
+        - in: path
+          name: transactionId
+          type: string
+          required: true
+          description: ID of the transaction to delete
+      produces:
+        - application/json
+      responses:
+        '204':
+          description: Transaction deleted successfully
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal Server Error
+
+definitions:
+  TransactionList:
+    type: array
+    items:
+      $ref: '#/definitions/TransactionGroup'
+  TransactionGroup:
+    type: object
+    properties:
+      accountId:
+        type: string
+        description: ID of the account
+      transactions:
+        type: array
+        items:
+          $ref: '#/definitions/Transaction'
+  Transaction:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Unique identifier for the transaction
+      accountId:
+        type: string
+        description: ID of the account associated with the transaction
+      amount:
+        type: number
+        description: Amount of the transaction
+      description:
+        type: string
+        description: Description of the transaction
+      date:
+        type: string
+        format: date
+        description: Date of the transaction
+  TransactionUpdate:
+    type: object
+    properties:
+      amount:
+        type: number
+        description: Updated amount of the transaction
+      description:
+        type: string
+        description: Updated description of the transaction
+      date:
+        type: string
+        format: date
+        description: Updated date of the transaction
