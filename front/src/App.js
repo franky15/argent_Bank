@@ -26,7 +26,7 @@ function App() {
         <Route element={<AdminLayout/>}>
           <Route path='/admin/*' element={
              <AuthGuard>
-              <AdminRouter/>
+                <AdminRouter/>
              </AuthGuard>
             
           }/>
@@ -40,7 +40,3 @@ function App() {
 }
 
 export default App;
-
-/*<AuthGuard>
-  <AdminRouter/>
-</AuthGuard>*/

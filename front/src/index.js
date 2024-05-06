@@ -6,8 +6,33 @@ import reportWebVitals from './reportWebVitals';
 
 
 //importation des éléments de redux et du store
+import {configureStore} from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
-import store from './_services/redux/store/store';
+import authReducer from './features/_slices/authSlice';
+import userReducer from './features/_slices/userSlice';
+//import store from './_services/redux/store/store';
+
+
+//creation du store
+const store = configureStore({
+
+  reducer: {
+
+   auth: authReducer,
+   user: userReducer,
+
+  },
+
+  
+});
+
+//éxécution des actions ou fonction asynchrones 
+
+
+
+
+
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

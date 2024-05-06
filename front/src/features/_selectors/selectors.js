@@ -3,7 +3,7 @@
 
 
 //récupération du status de l'authentification de l'utilisateur
-export const isAuthenticatedSelector = (state) => state.reducerAuth.isAuthenticated;
+export const isAuthenticatedSelector = (state) => state.auth;
 
 //récupération du token de l'utilisateur
 export const tokenSelector = (state) => state.reducerAuth.token;

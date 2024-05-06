@@ -1,21 +1,14 @@
 import React,{useEffect,useState} from 'react';
 
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate, useLocation } from 'react-router-dom'; 
 
 import { useSelector, useDispatch } from 'react-redux';
 
 //importation des actions
-import { userUpdateSuccess } from '../../../_services/redux/reducers/User.Reducer';
 
+import { getUser, updateUser } from '../../../features/_slices/userSlice';
 import { userServices } from '../../../_services/User.services';
 import { accountServices } from '../../../_services/Account.services';
-
-//importation des selectors qui permettent de récupérer les données du store
-import {  getuserSelector } from '../../../_services/redux/selectors/selectors';
-
-//importation de l'action assynchrone (thunk creator) qui permet de gérer les actions asynchrones
-import { getUserThunk} from '../../../_services/redux/reducers/User.Reducer';
-
 
 
 const Profile = () => {
@@ -24,8 +17,14 @@ const Profile = () => {
 
     const dispatch = useDispatch();
 
+    const userStore = useSelector((state) => state.user);
+
+    const location = useLocation();
+    const url = location;
+
+    console.log('**url', url.pathname);
      //récupération de l'url de la page
-     const url = window.location.href;
+     //const url = window.location.href;
 
     //NB: useSelector est rechargé à chaque fois que le store est mis à jour on ne peut pas non plus le mettre dans useEffect car le dispatch est asynchrone ainsi il y a un décalage entre le moment où le store est mis à jour et le moment où le useSelector est rechargé
   
@@ -47,34 +46,9 @@ const Profile = () => {
     useEffect(() => {
 
         //dispatch de l'action getUserThunk qui permet de récupérer l'utilisateur à chaque fois que dispatch est appelé
-        dispatch(getUserThunk);
+        dispatch(getUser());
 
-        ///////////////////////////
-        
-
-        //fonction de gestion de la redirection de l'utilisateur qui n'est pas connecté quand il veut accéder à la page admin
-        const redirect = () => {
-
-
-            const token = localStorage.getItem('token');
-
-            console.log("****token",token);
-
-            if(  (token === "undefined"  || token === null ) && url.includes("admin") ){
-
-                navigate('/auth/login');
-
-                console.log("***redirect");
-            }
-            
-        }
-
-        //redirect()
-
-
-        //////////////////////////
-
-    }, [dispatch, url, navigate]);
+    }, [dispatch]);
    
     //fonction de gestion des changements des champs et mise à jour du state
     const change = (e) => {
@@ -152,29 +126,29 @@ const Profile = () => {
             
 
             //requet de mise à jour de l'utilisateur
-            userServices.updateUser(data)
-                .then(res => {
+            dispatch(updateUser(data));
 
-                    //console.log('**res.data.body', res.data);
+            //récupération du user dans le store stocker lors du dispatch de l'action getUserThunk
+            const userUpdateSuccess = userStore.userUpdateSuccess;
+                
+            if(userUpdateSuccess){
 
-                   dispatch(userUpdateSuccess(res.data.body));
+                //dispatch de l'action getUserThunk qui permet de récupérer l'utilisateur à chaque fois que dispatch est appelé
+                dispatch(getUser());
 
-                   //reinitialisation des champs car on ne réinitialise pas la page
-                    setData({
-                        firstName: "",//"First Name",
-                        lastName: "",//"Last Name",
-                    });
+                //reinitialisation des champs car on ne réinitialise pas la page
+                setData({
+                    firstName: "",//"First Name",
+                    lastName: "",//"Last Name",
+                });
 
-                    setAlerteInput({...alerteInput, alerteInput: false, alerteInputFirstName: false, alerteInputLastName: false});
-                   
-                    toggleBlockBtn()
-                    toggleButtonVisibility()
-                    
+                setAlerteInput({...alerteInput, alerteInput: false, alerteInputFirstName: false, alerteInputLastName: false});
+               
+                toggleBlockBtn()
+                toggleButtonVisibility()
 
-                })
-                .catch(error => {
-                    console.error(error);
-                })
+            }
+            
 
         }else{
 
@@ -201,28 +175,10 @@ const Profile = () => {
     const token = accountServices.getToken("token");
 
     //récupération du user dans le store stocker lors du dispatch de l'action getUserThunk
-    const user = useSelector(getuserSelector);
+    const user = userStore.user;
 
-    let userSelect = null;
+    let userSelect = user;
 
-    if(user !== null && user !== undefined){
-
-        //gestion de la valeur lorsqu'on modifie les données de l'utilisateur
-        let userSelect1 = user;
-
-         // Stockage des données dans le localStorage
-         localStorage.setItem('user', JSON.stringify(userSelect1)); 
-
-        //récupération du user dans localstorage et non du store car il faut que la donnée persiste même si on recharge la page
-        userSelect = JSON.parse(localStorage.getItem('user'));
-
-    
-    }else{
-
-         //récupération du user dans localstorage et non du store car il faut que la donnée persiste même si on recharge la page
-         userSelect = JSON.parse(localStorage.getItem('user'));
-
-    }
 
    
     return (
@@ -233,8 +189,6 @@ const Profile = () => {
                 <div className="header">
                     <h1>Welcome back<br />{  userSelect.firstName + " " + userSelect.lastName}</h1>
                    
-                    
-                     
                     {
                        isOpen.blockBtn && 
                        <div className='containerInput'>

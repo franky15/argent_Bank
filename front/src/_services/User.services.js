@@ -6,8 +6,6 @@ let getUser = () =>{
 }
 
 
-
-
 let updateUser = (userObject) => {
     return Axios.put("/api/v1/user/profile",  userObject)  //on envoie user 
 }

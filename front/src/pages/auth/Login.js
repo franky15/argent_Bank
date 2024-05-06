@@ -1,99 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {  useDispatch } from 'react-redux';  //useSelector,
+import {  useDispatch, useSelector } from 'react-redux';  
 
-//importation des actions
-import { loginSuccess, logoutSuccess, loginFailure  } from '../../_services/redux/reducers/Account.Reducer';
 
 import {jwtDecode } from 'jwt-decode'; // Correction de l'import de jwtDecode
 
 import { accountServices } from '../../_services/Account.services';
 
+import { login } from '../../features/_slices/authSlice';
+
+
 const Login = () => {
 
 	const dispatch = useDispatch();
 
+    const userStore = useSelector((state) => state.auth.user);
+
+    console.log('**userStore', userStore);
+
     const navigate = useNavigate();
 
-    const [login, setLogin] = useState({
+    const [loginObject, setLoginObject] = useState({
         email: "",
         password: "",
     });
 
     const change = (e) => {
-        setLogin({ ...login, [e.target.name]: e.target.value });
+        setLoginObject({ ...loginObject, [e.target.name]: e.target.value });
     }
 
-	//console.log('**login', login)
+	//console.log('**loginObject', loginObject)
 
     const submit = (e) => {
 
         e.preventDefault(); // Prévenir le comportement par défaut du formulaire
 
-        if (login.email.trim() && login.password.trim()) { // Correction de la condition de vérification du formulaire
-           
-			accountServices.login(login)
-                .then(res => {
+        if (loginObject.email.trim() && loginObject.password.trim()) { // Correction de la condition de vérification du formulaire
 
-					//console.log('**res.data', res.data);
-					//console.log('**res.data.body.', res.data.body.token);
+            dispatch(login(loginObject))
 
-                     //stockage du token dans le localstorage
-                    accountServices.saveToken(res.data.body.token);
-					//récupération du token
-                    const token = accountServices.getToken("token");
-					
-                    if (token) {
+            console.log('**userStore.userId', userStore);
 
-                        try {
-							
-                            const decodedToken = jwtDecode(token);
-                            const userId = decodedToken.id;
-                            const expireToken = decodedToken.exp;
-                            const timeInSecond = Math.floor(Date.now() / 1000);
+            
+            dispatch(login(loginObject)).then(() => {
 
-							//console.log('**decodedToken', decodedToken);
-							//console.log('**userId', userId);
-							
-                            if (userId && expireToken > timeInSecond) { // Correction de la condition de vérification du token
-                             
-								
-								//console.log(('***userId', userId));
-							
-								dispatch(loginSuccess(userId));
-                                
-							
-								navigate(`/admin/profile/${userId}`);
+                //récupération de l'id de l'utilisateur du localstorage
+                const id = localStorage.getItem("userId");
 
-                            } else {
+                console.log('**id', id);
 
-								//déconnexion de l'utilisateur entrainant la suppression du token du localstorage
-                                accountServices.logout();
+                navigate(`/admin/profile/${id}`); 
 
-								//dispatch de l'action logoutSuccess entrainant la mise à jour du stateglobal
-								dispatch(logoutSuccess());
+            });
 
-                                navigate("/");
-                            }
-
-                        } catch (error) {
-
-                            console.error('Erreur lors du décodage du token :', error);
-							
-							//déconnexion de l'utilisateur entrainant la suppression du token du localstorage
-							accountServices.logout();
-
-							//dispatch de l'action logoutSuccess entrainant la mise à jour du stateglobal
-							dispatch(logoutSuccess());
-                            navigate("/");
-                        }
-
-                    }
-                })
-                .catch(error => {
-                    console.error(error);
-                })
-
+        
         }
     }
 
