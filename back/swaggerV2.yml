@@ -14,7 +14,16 @@ paths:
       tags:
         - Transaction Module
       summary: Get Transactions
-      description: Retrieve all transactions for the current month, grouped by account
+      description: Retrieve all transactions for the current month or specified month, grouped by account
+      parameters:
+        - in: query
+          name: month
+          type: string
+          description: Month in YYYY-MM format (e.g., "2024-05") to filter transactions for a specific month
+        - in: query
+          name: accountId
+          type: string
+          description: ID of the account to filter transactions by
       produces:
         - application/json
       responses:
@@ -22,6 +31,29 @@ paths:
           description: Transactions retrieved successfully
           schema:
             $ref: '#/definitions/TransactionList'
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
+    post:
+      tags:
+        - Transaction Module
+      summary: Create Transaction
+      description: Create a new transaction
+      parameters:
+        - in: body
+          name: body
+          description: Transaction details
+          required: true
+          schema:
+            $ref: '#/definitions/TransactionCreate'
+      produces:
+        - application/json
+      responses:
+        '201':
+          description: Transaction created successfully
+          schema:
+            $ref: '#/definitions/Transaction'
         '400':
           description: Invalid Fields
         '500':
@@ -53,7 +85,7 @@ paths:
       tags:
         - Transaction Module
       summary: Update Transaction
-      description: Update details of a specific transaction
+      description: Update details of a specific transaction (only updates category and associated information)
       parameters:
         - in: path
           name: transactionId
@@ -83,7 +115,7 @@ paths:
       tags:
         - Transaction Module
       summary: Delete Transaction
-      description: Delete a specific transaction
+      description: Delete a specific transaction (only deletes category and associated information)
       parameters:
         - in: path
           name: transactionId
@@ -97,6 +129,23 @@ paths:
           description: Transaction deleted successfully
         '404':
           description: Transaction not found
+        '500':
+          description: Internal Server Error
+  /accounts:
+    get:
+      tags:
+        - Account Module
+      summary: Get Bank Accounts
+      description: Retrieve a list of bank accounts
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Bank accounts retrieved successfully
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Account'
         '500':
           description: Internal Server Error
 
@@ -134,16 +183,40 @@ definitions:
         type: string
         format: date
         description: Date of the transaction
-  TransactionUpdate:
+  TransactionCreate:
     type: object
     properties:
+      accountId:
+        type: string
+        description: ID of the account associated with the transaction
       amount:
         type: number
-        description: Updated amount of the transaction
+        description: Amount of the transaction
       description:
         type: string
-        description: Updated description of the transaction
+        description: Description of the transaction
       date:
         type: string
         format: date
-        description: Updated date of the transaction
+        description: Date of the transaction
+  TransactionUpdate:
+    type: object
+    properties:
+      category:
+        type: string
+        description: Updated category of the transaction
+      categoryInfo:
+        type: string
+        description: Updated information associated with the category
+  Account:
+    type: object
+    properties:
+      accountId:
+        type: string
+        description: ID of the bank account
+      accountType:
+        type: string
+        description: Type of the bank account (e.g., checking, savings)
+      balance:
+        type: number
+        description: Current balance of the bank account

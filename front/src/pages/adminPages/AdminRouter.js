@@ -11,6 +11,7 @@ const AdminRouter = () => {
         <Routes>
             <Route>
                 <Route path='/profile/:id' element={<Profile />} />
+            
                 <Route path='*' element={<Error />} />
             </Route>
         </Routes>

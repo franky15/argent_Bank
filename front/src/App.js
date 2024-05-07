@@ -12,7 +12,7 @@ import AuthGuard from './_helpers/AuthGuard';
 //importation des layouts
 import AdminLayout from './pages/adminPages/AdminLayout';
 
-
+import Error from './_utils/Error';
 
 
 function App() {
@@ -23,6 +23,7 @@ function App() {
 
         <Route path='/*' element={<PublicRouter/>} />
         <Route path='/auth/*' element={<AuthRouter/>} />
+        <Route path='/error' element={<Error />} />
         <Route element={<AdminLayout/>}>
           <Route path='/admin/*' element={
              <AuthGuard>

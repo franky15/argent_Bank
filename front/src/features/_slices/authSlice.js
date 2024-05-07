@@ -8,8 +8,6 @@ const initialState = {
 
     token: "",
     userId: "",
-    //email: "",
-    //password: "",
     loginStatus: "",
     loginError: "",
 }
@@ -28,8 +26,21 @@ export const login = createAsyncThunk(
             return response.data
 
         }catch(err){
+
             console.log(err.code);
-            return rejectWithValue(err.response.data)
+            console.log("***err", err);
+
+            //initialState.loginError = err.code;
+
+           
+            initialState.loginStatus = "failed"; 
+            // initialState.loginError = err.code;
+            console.log("***loginError", initialState.loginError);
+            console.log("***loginError", initialState.loginError);
+
+            return rejectWithValue(err)
+
+            
         }
 
     }
@@ -73,6 +84,9 @@ const authSlice = createSlice({
                         //stockage deuserId dans le localstorage
                         localStorage.setItem("userId", decodedToken.id);
 
+                        //stockage de failed dans le localstorage
+                        localStorage.setItem("loginStatus", "");
+
                         return state;
                 
                     } catch (error) {
@@ -98,12 +112,14 @@ const authSlice = createSlice({
         builder
             .addCase(login.rejected, (state, action) => { 
 
-                console.log("****action.payload dans rejected", action.payload.error)
+                //console.log("****action.payload dans rejected", action.payload)
 
                 state.loginStatus = "failed"; 
-                state.loginError = action.payload.error; 
+                //stockage de failed dans le localstorage
+                localStorage.setItem("loginStatus", "failed");
 
-                console.log("erreur", action.payload.error);
+                console.log("***loginStatus", state.loginStatus);
+
             });
              
 

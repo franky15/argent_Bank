@@ -414,4 +414,35 @@ body {
   }
 }
 
+.Error{
+
+  height: 500px;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.titleError{
+  font-size: 50px;
+  font-weight: bold;
+  color: red;
+}
+.btnError{
+
+  background-color: white;
+  color: black;
+  padding: 10px;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+}
 /*# sourceMappingURL=index.css.map */
+
+
+/*****login*/
+.alertLogin{
+
+  color: red;
+}

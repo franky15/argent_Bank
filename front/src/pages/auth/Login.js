@@ -1,24 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {  useDispatch, useSelector } from 'react-redux';  
-
-
-import {jwtDecode } from 'jwt-decode'; // Correction de l'import de jwtDecode
-
-import { accountServices } from '../../_services/Account.services';
 
 import { login } from '../../features/_slices/authSlice';
 
 
 const Login = () => {
 
+
 	const dispatch = useDispatch();
 
-    const userStore = useSelector((state) => state.auth.user);
+    // const userStore = useSelector((state) => state.auth.user);
+    const userStore = useSelector((state) => state.auth);
 
-    console.log('**userStore', userStore);
+    //console.log('**userStore', userStore);
 
     const navigate = useNavigate();
+
+    const [loginAlert, setLoginAlert] = useState(false);
 
     const [loginObject, setLoginObject] = useState({
         email: "",
@@ -37,23 +36,37 @@ const Login = () => {
 
         if (loginObject.email.trim() && loginObject.password.trim()) { // Correction de la condition de vérification du formulaire
 
-            dispatch(login(loginObject))
-
-            console.log('**userStore.userId', userStore);
+            //dispatch(login(loginObject))
 
             
+
             dispatch(login(loginObject)).then(() => {
 
                 //récupération de l'id de l'utilisateur du localstorage
                 const id = localStorage.getItem("userId");
 
-                console.log('**id', id);
+                //récupération de loginStatus du localstorage
+                const loginStatus = localStorage.getItem("loginStatus");
 
-                navigate(`/admin/profile/${id}`); 
+                console.log('**userStore', userStore.loginStatus);
 
-            });
+                setLoginAlert(false);
 
-        
+                if(loginStatus === "failed" ){ 
+
+                    console.log('** loginStatus', loginStatus);
+
+                    setLoginAlert(true);
+                
+                }else{
+
+                    //setLoginAlert(false);
+
+                    navigate(`/admin/profile/${id}`); 
+                }
+
+            })
+
         }
     }
 
@@ -61,7 +74,8 @@ const Login = () => {
         <main className="main bg-dark"> {/* Utilisation de className au lieu de class */}
             <section className="sign-in-content"> {/* Utilisation de className au lieu de class */}
                 <i className="fa fa-user-circle sign-in-icon"></i>
-                <h1>Sign In</h1>
+                <h1>Sign In</h1>    
+                {   loginAlert && <p className='alertLogin'>Mot de passe ou email incorrect</p>}
                 <form>
                     <div className="input-wrapper"> {/* Utilisation de className au lieu de class */}
                         <label htmlFor="username">Username</label>

@@ -7,13 +7,10 @@ import { useSelector, useDispatch } from 'react-redux';
 //importation des actions
 
 import { getUser, updateUser } from '../../../features/_slices/userSlice';
-import { userServices } from '../../../_services/User.services';
 import { accountServices } from '../../../_services/Account.services';
 
 
 const Profile = () => {
-
-    const navigate = useNavigate();
 
     const dispatch = useDispatch();
 
@@ -120,7 +117,8 @@ const Profile = () => {
         const alertElement = document.querySelector('.alert');
 
         if (data && data.firstName.trim() !== "" && data.lastName.trim() !== ""
-             && regexpName.test(data.firstName) && regexpName.test(data.lastName) ) {
+             && regexpName.test(data.firstName) && regexpName.test(data.lastName) 
+) {
            
             
             
@@ -149,23 +147,42 @@ const Profile = () => {
 
             }
             
+            console.log(data.firstName.length)
 
         }else{
 
-            if (!regexpName.test(data.firstName) ) {
+            console.log('****error')
+
+            if (!regexpName.test(data.firstName)|| data.firstName.trim().length < 3 ) {
 
                 //setAlerteInput({...alerteInput, alerteInputFirstName: true, alerteInput: true});
                 fisrtNameElement.style.borderColor = "red";
                 alertElement.style.display = 'block';
                 
             } 
-            if ( !regexpName.test(data.lastName)) {
+            /*if ( data.firstName.trim().length < 3 ) {
+
+                //setAlerteInput({...alerteInput, alerteInputFirstName: true, alerteInput: true});
+                fisrtNameElement.style.borderColor = "red";
+                alertElement.style.display = 'block';
+                
+            } */
+            if ( !regexpName.test(data.lastName) || data.lastName.trim().length < 3 ) {
 
                 //setAlerteInput({...alerteInput, alerteInputLastName: true, alerteInput: true});
                 lastNameElement.style.borderColor = "red";
                 alertElement.style.display = 'block';
+                alertElement.innerHTML = "minimum 3 caractères";
               
             }
+            /*if (data.lastName.trim().length < 3 ) {
+
+                //setAlerteInput({...alerteInput, alerteInputFirstName: true, alerteInput: true});
+                fisrtNameElement.style.borderColor = "red";
+                alertElement.style.display = 'block';
+                alertElement.innerHTML = "minimum 3 caractères";
+                
+            } */
         
         }
 
